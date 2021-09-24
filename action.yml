@@ -35,34 +35,34 @@ runs:
   using: 'composite'
   steps:
     - name: Set Git identity 🆔
-      uses: ./actions/git-identity
+      uses: ${{ github.action_path }}/actions/git-identity
       with:
         domain: ${{ inputs.gitIdentityDomain }}
 
     - id: env
       name: Set environment variables 📝
-      uses: ./actions/set-env
+      uses: ${{ github.action_path }}/actions/set-env
       with:
         appNameSuffix: ${{ inputs.appNameSuffix }}
         registryUrl: ${{ inputs.registryUrl }}
 
     - id: build
       name: Build and push image 🛠️
-      uses: ./actions/docker
+      uses: ${{ github.action_path }}/actions/docker
       with:
         dockerContext: ${{ inputs.dockerContext }}
         appRegistryUrl: ${{ steps.env.outputs.appRegistryUrl }}
 
     - id: clone
       name: ArgoCD (Clone) ⏬
-      uses: ./actions/argo/clone
+      uses: ${{ github.action_path }}/actions/argo/clone
       with:
         appName: ${{ steps.env.outputs.appName }}
         stateRepoUrl: ${{ inputs.clusterStateRepo }}
 
     - id: update
       name: Update Kubernetes manifests 📚
-      uses: ./actions/kustomize
+      uses: ${{ github.action_path }}/actions/kustomize
       with:
         appName: ${{ steps.env.outputs.appName }}
         stateRepoDir: ${{ steps.clone.outputs.stateRepoDir }}
@@ -71,6 +71,6 @@ runs:
 
     - id: push
       name: ArgoCD (Push) ⏫
-      uses: ./actions/argo/push
+      uses: ${{ github.action_path }}/actions/argo/push
       with:
         stateRepoDir: ${{ steps.clone.outputs.stateRepoDir }}
