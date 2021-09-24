@@ -1,0 +1,30 @@
+# action.yml
+name: 'docker'
+description: 'Build and push the docker image'
+inputs:
+  appRegistryUrl:
+    description: 'Registry URL, complete with app name and commit SHA'
+    required: true
+  dockerContext:
+    description: 'Context path that will be passed to the `docker build` command'
+    required: false
+    default: '.'
+
+runs:
+  using: 'composite'
+  steps:
+    - run: |
+        function runHook() {
+          if [ -n "$1" ]; then
+            eval "$1"
+          fi
+        }
+
+        runHook "$DOCKER_BUILD_BEFORE"
+        docker build -t ${{ inputs.appRegistryUrl }} ${{ inputs.dockerContext }}
+        runHook "$DOCKER_BUILD_AFTER"
+
+        runHook "$DOCKER_PUSH_BEFORE"
+        docker push ${{ inputs.appRegistryUrl }}
+        runHook "$DOCKER_PUSH_AFTER"
+      shell: bash

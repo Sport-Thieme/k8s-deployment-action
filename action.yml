@@ -1,0 +1,76 @@
+# action.yml
+name: 'Docker Build and ArgoCD Deployment'
+description: 'Build an container and deploy through the ArgoCD GitOps flow'
+
+inputs:
+  registryUrl:
+    description: 'Container registry URL'
+    required: true
+  clusterStateRepo:
+    description: '(SSH) Git Repository URL which ArgoCD uses to define cluster state'
+    required: true
+  gitIdentityDomain:
+    description: 'The domain that should be appended to the GITHUB_ACTOR (e.g. example.com)'
+    default: 'sport-thieme.de'
+    required: false
+  appNameSuffix:
+    description: String that will be appended to the image name (useful if you have more than one image per repo)
+    required: false
+    default: ''
+  dockerContext:
+    description: 'Context path that will be passed to the `docker build` command'
+    required: false
+    default: '.'
+  deploymentDir:
+    description: 'Relative path to application manifest templates'
+    default: '.deployment'
+    required: false
+
+outputs:
+  prBranch:
+    description: 'Generated branch name in the ArgoCD state repository'
+    value: ${{ steps.push.outputs.prBranch }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set Git identity 🆔
+      uses: ./.github/actions/git-identity
+      with:
+        domain: ${{ inputs.gitIdentityDomain }}
+
+    - id: env
+      name: Set environment variables 📝
+      uses: ./.github/actions/set-env
+      with:
+        appNameSuffix: ${{ inputs.appNameSuffix }}
+        registryUrl: ${{ inputs.registryUrl }}
+
+    - id: build
+      name: Build and push image 🛠️
+      uses: ./.github/actions/docker
+      with:
+        dockerContext: ${{ inputs.dockerContext }}
+        appRegistryUrl: ${{ steps.env.outputs.appRegistryUrl }}
+
+    - id: clone
+      name: ArgoCD (Clone) ⏬
+      uses: ./.github/actions/argo/clone
+      with:
+        appName: ${{ steps.env.outputs.appName }}
+        stateRepoUrl: ${{ inputs.clusterStateRepo }}
+
+    - id: update
+      name: Update Kubernetes manifests 📚
+      uses: ./.github/actions/kustomize
+      with:
+        appName: ${{ steps.env.outputs.appName }}
+        stateRepoDir: ${{ steps.clone.outputs.stateRepoDir }}
+        appRegistryUrl: ${{ steps.env.outputs.appRegistryUrl }}
+        deploymentDir: ${{ inputs.deploymentDir }}
+
+    - id: push
+      name: ArgoCD (Push) ⏫
+      uses: ./.github/actions/argo/push
+      with:
+        stateRepoDir: ${{ steps.clone.outputs.stateRepoDir }}

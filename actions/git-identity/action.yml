@@ -1,0 +1,15 @@
+# action.yml
+name: 'git-identety'
+description: 'Set git user and email for git. This is important if we work with other repositories.'
+inputs:
+  domain:
+    description: 'The domain that should be appended to the GITHUB_ACTOR (e.g. example.com)'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - run: |
+        git config --global user.email "${GITHUB_ACTOR}@${{ inputs.domain }}"
+        git config --global user.name "${GITHUB_ACTOR}"
+      shell: bash

@@ -1,0 +1,29 @@
+# action.yml
+name: 'argo-clone'
+description: 'Clone the ArgoCD state repo into a temporary directory and expose the created directory'
+inputs:
+  appName:
+    description: 'Computer-friendly app name'
+    required: true
+  stateRepoUrl:
+    description: '(SSH) Git Repository URL which ArgoCD uses to define cluster state'
+    required: true
+outputs:
+  stateRepoDir:
+    description: 'Path where the ArgoCD state repository has been cloned to'
+    value: ${{ steps.prep.outputs.stateRepoDir }}
+
+runs:
+  using: 'composite'
+  steps:
+    - id: prep
+      run: |
+        STATE_REPO_DIR=$(mktemp) # Path reserveration
+        echo "STATE_REPO_DIR=${STATE_REPO_DIR}" >> $GITHUB_ENV
+        echo ::set-output name=stateRepoDir::"$(echo $STATE_REPO_DIR)"
+      shell: bash
+    - run: |
+        rm -d ${STATE_REPO_DIR} # This is needed (otherwise git will complain)
+        git clone ${{inputs.stateRepoUrl}} ${STATE_REPO_DIR}
+        mkdir -p ${STATE_REPO_DIR}/${{ inputs.appName }}
+      shell: bash

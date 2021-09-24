@@ -1,0 +1,39 @@
+# action.yml
+name: 'kustomize'
+description: 'Update image tags and run hooks'
+inputs:
+  appName:
+    description: 'Computer-friendly app name'
+    required: true
+  stateRepoDir:
+    description: 'Path where the ArgoCD state repository has been cloned to'
+    required: true
+  appRegistryUrl:
+    description: 'Registry URL, complete with app name and commit SHA'
+    required: true
+  deploymentDir:
+    description: 'Relative path to application manifest templates'
+    default: '.deployment'
+    required: false
+
+runs:
+  using: 'composite'
+  steps:
+    - run: |
+        function runHook() {
+          if [ -n "$1" ]; then
+            eval "$1"
+          fi
+        }
+
+        cd ${{ inputs.deploymentDir }}
+
+        runHook "$KUSTOMIZE_EDIT_BEFORE"
+        kustomize edit set image IMG=${{ inputs.appRegistryUrl }}
+        runHook "$KUSTOMIZE_EDIT_AFTER"
+
+        runHook "$KUSTOMIZE_BUILD_BEFORE"
+        kustomize build . > ${{ inputs.stateRepoDir }}/${{ inputs.appName }}/${{ inputs.appName }}.yml
+        runHook "$KUSTOMIZE_BUILD_AFTER"
+
+      shell: bash
