@@ -35,34 +35,34 @@ runs:
   using: 'composite'
   steps:
     - name: Set Git identity 🆔
-      uses: ./.github/actions/git-identity
+      uses: ./actions/git-identity
       with:
         domain: ${{ inputs.gitIdentityDomain }}
 
     - id: env
       name: Set environment variables 📝
-      uses: ./.github/actions/set-env
+      uses: ./actions/set-env
       with:
         appNameSuffix: ${{ inputs.appNameSuffix }}
         registryUrl: ${{ inputs.registryUrl }}
 
     - id: build
       name: Build and push image 🛠️
-      uses: ./.github/actions/docker
+      uses: ./actions/docker
       with:
         dockerContext: ${{ inputs.dockerContext }}
         appRegistryUrl: ${{ steps.env.outputs.appRegistryUrl }}
 
     - id: clone
       name: ArgoCD (Clone) ⏬
-      uses: ./.github/actions/argo/clone
+      uses: ./actions/argo/clone
       with:
         appName: ${{ steps.env.outputs.appName }}
         stateRepoUrl: ${{ inputs.clusterStateRepo }}
 
     - id: update
       name: Update Kubernetes manifests 📚
-      uses: ./.github/actions/kustomize
+      uses: ./actions/kustomize
       with:
         appName: ${{ steps.env.outputs.appName }}
         stateRepoDir: ${{ steps.clone.outputs.stateRepoDir }}
@@ -71,6 +71,6 @@ runs:
 
     - id: push
       name: ArgoCD (Push) ⏫
-      uses: ./.github/actions/argo/push
+      uses: ./actions/argo/push
       with:
         stateRepoDir: ${{ steps.clone.outputs.stateRepoDir }}
