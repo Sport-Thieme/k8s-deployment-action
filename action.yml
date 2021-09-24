@@ -35,34 +35,34 @@ runs:
   using: 'composite'
   steps:
     - name: Set Git identity 🆔
-      uses: ${{ github.action_path }}/actions/git-identity
+      uses: Sport-Thieme/k8s-deployment-action/actions/git-identity@master
       with:
         domain: ${{ inputs.gitIdentityDomain }}
 
     - id: env
       name: Set environment variables 📝
-      uses: ${{ github.action_path }}/actions/set-env
+      uses: Sport-Thieme/k8s-deployment-action/actions/set-env@master
       with:
         appNameSuffix: ${{ inputs.appNameSuffix }}
         registryUrl: ${{ inputs.registryUrl }}
 
     - id: build
       name: Build and push image 🛠️
-      uses: ${{ github.action_path }}/actions/docker
+      uses: Sport-Thieme/k8s-deployment-action/actions/docker@master
       with:
         dockerContext: ${{ inputs.dockerContext }}
         appRegistryUrl: ${{ steps.env.outputs.appRegistryUrl }}
 
     - id: clone
       name: ArgoCD (Clone) ⏬
-      uses: ${{ github.action_path }}/actions/argo/clone
+      uses: Sport-Thieme/k8s-deployment-action/actions/argo/clone@master
       with:
         appName: ${{ steps.env.outputs.appName }}
         stateRepoUrl: ${{ inputs.clusterStateRepo }}
 
     - id: update
       name: Update Kubernetes manifests 📚
-      uses: ${{ github.action_path }}/actions/kustomize
+      uses: Sport-Thieme/k8s-deployment-action/actions/kustomize@master
       with:
         appName: ${{ steps.env.outputs.appName }}
         stateRepoDir: ${{ steps.clone.outputs.stateRepoDir }}
@@ -71,6 +71,6 @@ runs:
 
     - id: push
       name: ArgoCD (Push) ⏫
-      uses: ${{ github.action_path }}/actions/argo/push
+      uses: Sport-Thieme/k8s-deployment-action/actions/argo/push@master
       with:
         stateRepoDir: ${{ steps.clone.outputs.stateRepoDir }}
