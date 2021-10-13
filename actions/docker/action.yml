@@ -9,6 +9,9 @@ inputs:
     description: 'Context path that will be passed to the `docker build` command'
     required: false
     default: '.'
+  nodeAuthToken:
+    description: 'NPM Auth token to install with'
+    required: false
 
 runs:
   using: 'composite'
@@ -28,3 +31,5 @@ runs:
         docker push ${{ inputs.appRegistryUrl }}
         runHook "$DOCKER_PUSH_AFTER"
       shell: bash
+      env:
+        NODE_AUTH_TOKEN: ${{ inputs.nodeAuthToken }}

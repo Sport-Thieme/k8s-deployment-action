@@ -13,6 +13,9 @@ inputs:
     description: 'The domain that should be appended to the GITHUB_ACTOR (e.g. example.com)'
     default: 'sport-thieme.de'
     required: false
+  nodeAuthToken:
+    description: 'NPM Auth token to install with'
+    required: false
   appNameSuffix:
     description: String that will be appended to the image name (useful if you have more than one image per repo)
     required: false
@@ -51,6 +54,7 @@ runs:
       uses: Sport-Thieme/k8s-deployment-action/actions/docker@master
       with:
         dockerContext: ${{ inputs.dockerContext }}
+        nodeAuthToken: ${{ inputs.nodeAuthToken }}
         appRegistryUrl: ${{ steps.env.outputs.appRegistryUrl }}
 
     - id: clone
