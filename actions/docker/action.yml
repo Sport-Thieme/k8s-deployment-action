@@ -24,7 +24,7 @@ runs:
         }
 
         runHook "$DOCKER_BUILD_BEFORE"
-        docker build -t ${{ inputs.appRegistryUrl }} ${{ inputs.dockerContext }}
+        docker build -t ${{ inputs.appRegistryUrl }} ${{ inputs.dockerContext }} --build-arg NODE_AUTH_TOKEN="${{ inputs.nodeAuthToken }}"
         runHook "$DOCKER_BUILD_AFTER"
 
         runHook "$DOCKER_PUSH_BEFORE"
