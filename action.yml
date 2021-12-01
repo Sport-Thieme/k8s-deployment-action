@@ -91,7 +91,7 @@ runs:
 
     - id: register
       name: Register Application with ArgoCD ✍️
-      uses: Sport-Thieme/k8s-deployment-action/actions/register@feat/argo-appcrd
+      uses: Sport-Thieme/k8s-deployment-action/actions/argo/register@feat/argo-appcrd
       with:
         appCrdDir: ${{ inputs.appCrdDir }}
         appName: ${{ steps.env.outputs.appName }}
