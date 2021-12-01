@@ -54,20 +54,20 @@ runs:
   using: 'composite'
   steps:
     - name: Set Git identity 🆔
-      uses: Sport-Thieme/k8s-deployment-action/actions/git-identity@master
+      uses: Sport-Thieme/k8s-deployment-action/actions/git-identity@feat/argo-appcrd
       with:
         domain: ${{ inputs.gitIdentityDomain }}
 
     - id: env
       name: Set environment variables 📝
-      uses: Sport-Thieme/k8s-deployment-action/actions/set-env@master
+      uses: Sport-Thieme/k8s-deployment-action/actions/set-env@feat/argo-appcrd
       with:
         appNameSuffix: ${{ inputs.appNameSuffix }}
         registryUrl: ${{ inputs.registryUrl }}
 
     - id: build
       name: Build and push image 🛠️
-      uses: Sport-Thieme/k8s-deployment-action/actions/docker@master
+      uses: Sport-Thieme/k8s-deployment-action/actions/docker@feat/argo-appcrd
       with:
         dockerContext: ${{ inputs.dockerContext }}
         nodeAuthToken: ${{ inputs.nodeAuthToken }}
@@ -75,14 +75,14 @@ runs:
 
     - id: clone
       name: ArgoCD (Clone) ⏬
-      uses: Sport-Thieme/k8s-deployment-action/actions/argo/clone@master
+      uses: Sport-Thieme/k8s-deployment-action/actions/argo/clone@feat/argo-appcrd
       with:
         appName: ${{ steps.env.outputs.appName }}
         stateRepoUrl: ${{ inputs.clusterStateRepo }}
 
     - id: update
       name: Update Kubernetes manifests 📚
-      uses: Sport-Thieme/k8s-deployment-action/actions/kustomize@master
+      uses: Sport-Thieme/k8s-deployment-action/actions/kustomize@feat/argo-appcrd
       with:
         appName: ${{ steps.env.outputs.appName }}
         stateRepoDir: ${{ steps.clone.outputs.stateRepoDir }}
@@ -91,7 +91,7 @@ runs:
 
     - id: register
       name: Register Application with ArgoCD ✍️
-      uses: Sport-Thieme/k8s-deployment-action/actions/register@master
+      uses: Sport-Thieme/k8s-deployment-action/actions/register@feat/argo-appcrd
       with:
         appCrdDir: ${{ inputs.appCrdDir }}
         appName: ${{ steps.env.outputs.appName }}
@@ -103,7 +103,7 @@ runs:
 
     - id: push
       name: ArgoCD (Push) ⏫
-      uses: Sport-Thieme/k8s-deployment-action/actions/argo/push@master
+      uses: Sport-Thieme/k8s-deployment-action/actions/argo/push@feat/argo-appcrd
       with:
         appName: ${{ steps.env.outputs.appName }}
         stateRepoDir: ${{ steps.clone.outputs.stateRepoDir }}
