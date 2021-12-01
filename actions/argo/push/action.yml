@@ -21,7 +21,7 @@ runs:
         GIT_PR_BRANCH="${GITHUB_ACTOR}__${{ inputs.appName }}__${GITHUB_SHA}"
         cd ${{ inputs.stateRepoDir }}
         git checkout -b ${GIT_PR_BRANCH}
-        git add ${{ inputs.stateRepoDir }}/${{ inputs.appName }}/${{ inputs.appName }}.yml
+        git add .
         git commit -m "${{ inputs.appName }} pushed ${GITHUB_SHA}"
         git push --set-upstream origin ${GIT_PR_BRANCH}
         echo "::set-output name=prBranch::${GIT_PR_BRANCH}"
