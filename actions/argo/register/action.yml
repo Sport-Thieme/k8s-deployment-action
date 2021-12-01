@@ -41,19 +41,12 @@ runs:
 
         CRD_PATH="${{ inputs.stateRepoDir }}/${{ inputs.appCrdDir }}/${{ inputs.appName }}.yml"
         if [ ! -f "${CRD_PATH}" ]; then
-          APP_NAME="${{ inputs.appName }}"
-          PROJECT_NAME="${{ inputs.projectName }}"
-          SOURCE_REPO_URL="${{ inputs.clusterStateRepo }}"
-          SOURCE_TARGET_REVISION="${{ inputs.clusterStateRepoRevision }}"
-          SOURCE_PATH="${{ inputs.appName }}"
-
-          cp ${{ github.action_path }}/tpl/app.yml $CRD_PATH
-          cat $CRD_PATH | sed -e "s/::APP_NAME::/${APP_NAME}/"
-          cat $CRD_PATH | sed -e "s/::PROJECT_NAME::/${PROJECT_NAME}/"
-          cat $CRD_PATH | sed -e "s/::SOURCE_REPO_URL::/${SOURCE_REPO_URL}/"
-          cat $CRD_PATH | sed -e "s/::SOURCE_TARGET_REVISION::/${SOURCE_TARGET_REVISION}/"
-          cat $CRD_PATH | sed -e "s/::SOURCE_PATH::/${SOURCE_PATH}/"
-          cat $CRD_PATH | sed -e "s/::DESTINATION::/${DESTINATION}/"
+          export APP_NAME="${{ inputs.appName }}"
+          export PROJECT_NAME="${{ inputs.projectName }}"
+          export SOURCE_REPO_URL="${{ inputs.clusterStateRepo }}"
+          export SOURCE_TARGET_REVISION="${{ inputs.clusterStateRepoRevision }}"
+          export SOURCE_PATH="${{ inputs.appName }}"
+          envsubst < ${{ github.action_path }}/tpl/app.tmpl > $CRD_PATH
 
           echo "::set-output name=created::false"
           exit 0
