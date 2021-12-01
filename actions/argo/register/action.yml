@@ -40,7 +40,7 @@ runs:
         cd ${{ inputs.stateRepoDir }}
 
         CRD_PATH="${{ inputs.stateRepoDir }}/${{ inputs.appCrdDir }}/${{ inputs.appName }}.yml"
-        if [ -z "${CRD_PATH}" ]; then
+        if [ ! -f "${CRD_PATH}" ]; then
           APP_NAME="${{ inputs.appName }}"
           PROJECT_NAME="${{ inputs.projectName }}"
           SOURCE_REPO_URL="${{ inputs.clusterStateRepo }}"
