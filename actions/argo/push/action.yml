@@ -2,6 +2,9 @@
 name: 'argo-push'
 description: 'Push the updated ArgoCD state'
 inputs:
+  appName:
+    description: 'Computer-friendly app name'
+    required: true
   stateRepoDir:
     description: 'Path to the cloned ArgoCD state repository'
     required: true
@@ -15,11 +18,11 @@ runs:
   steps:
     - id: push
       run: |
-        GIT_PR_BRANCH="${GITHUB_ACTOR}__${APP_NAME}__${GITHUB_SHA}"
+        GIT_PR_BRANCH="${GITHUB_ACTOR}__${{ inputs.appName }}__${GITHUB_SHA}"
         cd ${{ inputs.stateRepoDir }}
         git checkout -b ${GIT_PR_BRANCH}
-        git add ${{ inputs.stateRepoDir }}/${APP_NAME}/${APP_NAME}.yml
-        git commit -m "${APP_NAME} pushed ${GITHUB_SHA}"
+        git add ${{ inputs.stateRepoDir }}/${{ inputs.appName }}/${{ inputs.appName }}.yml
+        git commit -m "${{ inputs.appName }} pushed ${GITHUB_SHA}"
         git push --set-upstream origin ${GIT_PR_BRANCH}
         echo "::set-output name=prBranch::${GIT_PR_BRANCH}"
       shell: bash

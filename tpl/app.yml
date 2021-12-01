@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: "::APP_NAME::"
+  namespace: argocd
+spec:
+  project: "::PROJECT_NAME::"
+  source:
+    repoURL: "::SOURCE_REPO_URL::"
+    targetRevision: "::SOURCE_TARGET_REVISION::"
+    path: "::SOURCE_PATH::"
+  destination:
+    name: "::DESTINATION::"
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+     - CreateNamespace=true
+     - PruneLast=true

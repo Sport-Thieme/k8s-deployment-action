@@ -6,9 +6,25 @@ inputs:
   registryUrl:
     description: 'Container registry URL'
     required: true
+  projectName:
+    description: 'ArgoCD project name to use'
+    default: 'default'
+    required: false
+  destination:
+    description: 'Which ArgoCD cluster to use'
+    default: 'in-cluster'
+    required: false
+  appCrdDir:
+    description: 'Relative path to the state repositories ArgoCD Application CRD dropoff'
+    default: 'application-crds'
+    required: false
   clusterStateRepo:
     description: '(SSH) Git Repository URL which ArgoCD uses to define cluster state'
     required: true
+  clusterStateRepoRevision:
+    description: 'Git Repository Target'
+    default: 'master'
+    required: false
   gitIdentityDomain:
     description: 'The domain that should be appended to the GITHUB_ACTOR (e.g. example.com)'
     default: 'sport-thieme.de'
@@ -73,8 +89,21 @@ runs:
         appRegistryUrl: ${{ steps.env.outputs.appRegistryUrl }}
         deploymentDir: ${{ inputs.deploymentDir }}
 
+    - id: register
+      name: Register Application with ArgoCD ✍️
+      uses: Sport-Thieme/k8s-deployment-action/actions/register@master
+      with:
+        appCrdDir: ${{ inputs.appCrdDir }}
+        appName: ${{ steps.env.outputs.appName }}
+        projectName: ${{ inputs.projectName }}
+        destination: ${{ inputs.destination }}
+        stateRepoDir: ${{ steps.clone.outputs.stateRepoDir }}
+        clusterStateRepo: ${{ inputs.clusterStateRepo }}
+        clusterStateRepoRevision: ${{ inputs.clusterStateRepoRevision }}
+
     - id: push
       name: ArgoCD (Push) ⏫
       uses: Sport-Thieme/k8s-deployment-action/actions/argo/push@master
       with:
+        appName: ${{ steps.env.outputs.appName }}
         stateRepoDir: ${{ steps.clone.outputs.stateRepoDir }}

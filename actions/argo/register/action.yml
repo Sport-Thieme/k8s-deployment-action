@@ -1,0 +1,63 @@
+# action.yml
+name: 'argo-register'
+description: 'Register the application by dropping an ArgoCD Application CRD'
+inputs:
+  appName:
+    description: 'Computer-friendly app name'
+    required: true
+  projectName:
+    description: 'ArgoCD project name to use'
+    default: 'default'
+    required: false
+  destination:
+    description: 'Which ArgoCD cluster to use'
+    default: 'in-cluster'
+    required: false
+  stateRepoDir:
+    description: 'Path to the cloned ArgoCD state repository'
+    required: true
+  clusterStateRepo:
+    description: '(SSH) Git Repository URL which ArgoCD uses to define cluster state'
+    required: true
+  clusterStateRepoRevision:
+    description: 'Git Repository Target'
+    default: 'master'
+    required: false
+  appCrdDir:
+    description: 'Relative path to the state repositories ArgoCD Application CRD dropoff'
+    default: 'application-crds'
+    required: false
+outputs:
+  created:
+    description: 'Whether the app has been created or not'
+    value: ${{ steps.register.outputs.created }}
+
+runs:
+  using: 'composite'
+  steps:
+    - id: register
+      run: |
+        cd ${{ inputs.stateRepoDir }}
+
+        CRD_PATH="${{ inputs.stateRepoDir }}/${{ inputs.appCrdDir }}/${{ inputs.appName }}.yml"
+        if [ -z "${CRD_PATH}" ]; then
+          APP_NAME="${{ inputs.appName }}"
+          PROJECT_NAME="${{ inputs.projectName }}"
+          SOURCE_REPO_URL="${{ inputs.clusterStateRepo }}"
+          SOURCE_TARGET_REVISION="${{ inputs.clusterStateRepoRevision }}"
+          SOURCE_PATH="${{ inputs.appName }}"
+
+          cp ${{ github.action_path }}/tpl/app.yml $CRD_PATH
+          sed -i 's/::APP_NAME::/${APP_NAME}/' $CRD_PATH
+          sed -i 's/::PROJECT_NAME::/${PROJECT_NAME}/' $CRD_PATH
+          sed -i 's/::SOURCE_REPO_URL::/${SOURCE_REPO_URL}/' $CRD_PATH
+          sed -i 's/::SOURCE_TARGET_REVISION::/${SOURCE_TARGET_REVISION}/' $CRD_PATH
+          sed -i 's/::SOURCE_PATH::/${SOURCE_PATH}/' $CRD_PATH
+          sed -i 's/::DESTINATION::/${DESTINATION}/' $CRD_PATH
+
+          echo "::set-output name=created::false"
+          exit 0
+        fi
+
+        echo "::set-output name=created::false"
+      shell: bash
