@@ -48,12 +48,12 @@ runs:
           SOURCE_PATH="${{ inputs.appName }}"
 
           cp ${{ github.action_path }}/tpl/app.yml $CRD_PATH
-          sed -i 's/::APP_NAME::/${APP_NAME}/' $CRD_PATH
-          sed -i 's/::PROJECT_NAME::/${PROJECT_NAME}/' $CRD_PATH
-          sed -i 's/::SOURCE_REPO_URL::/${SOURCE_REPO_URL}/' $CRD_PATH
-          sed -i 's/::SOURCE_TARGET_REVISION::/${SOURCE_TARGET_REVISION}/' $CRD_PATH
-          sed -i 's/::SOURCE_PATH::/${SOURCE_PATH}/' $CRD_PATH
-          sed -i 's/::DESTINATION::/${DESTINATION}/' $CRD_PATH
+          sed -i "s/::APP_NAME::/${APP_NAME}/" $CRD_PATH
+          sed -i "s/::PROJECT_NAME::/${PROJECT_NAME}/" $CRD_PATH
+          sed -i "s/::SOURCE_REPO_URL::/${SOURCE_REPO_URL}/" $CRD_PATH
+          sed -i "s/::SOURCE_TARGET_REVISION::/${SOURCE_TARGET_REVISION}/" $CRD_PATH
+          sed -i "s/::SOURCE_PATH::/${SOURCE_PATH}/" $CRD_PATH
+          sed -i "s/::DESTINATION::/${DESTINATION}/" $CRD_PATH
 
           echo "::set-output name=created::false"
           exit 0
