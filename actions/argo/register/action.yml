@@ -43,6 +43,7 @@ runs:
         if [ ! -f "${CRD_PATH}" ]; then
           export APP_NAME="${{ inputs.appName }}"
           export PROJECT_NAME="${{ inputs.projectName }}"
+          export DESTINATION="${{ inputs.destination }}"
           export SOURCE_REPO_URL="${{ inputs.clusterStateRepo }}"
           export SOURCE_TARGET_REVISION="${{ inputs.clusterStateRepoRevision }}"
           export SOURCE_PATH="${{ inputs.appName }}"
